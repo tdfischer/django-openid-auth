@@ -133,6 +133,9 @@ class OpenIDBackend:
                 first_name = u''
                 last_name = fullname
 
+        if not nickname:
+                nickname = email
+
         return dict(email=email, nickname=nickname,
                     first_name=first_name, last_name=last_name)
 
