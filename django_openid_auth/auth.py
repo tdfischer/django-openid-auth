@@ -134,7 +134,7 @@ class OpenIDBackend:
                 last_name = fullname
 
         if not nickname:
-                nickname = email
+                nickname = email[:30]
 
         return dict(email=email, nickname=nickname,
                     first_name=first_name, last_name=last_name)
@@ -156,7 +156,7 @@ class OpenIDBackend:
             except User.DoesNotExist:
                 break
             i += 1
-
+  
         user = User.objects.create_user(username, email, password=None)
         self.update_user_details(user, details)
 
