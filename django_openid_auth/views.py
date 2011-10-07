@@ -162,6 +162,7 @@ def login_begin(request, template_name='openid/login.html',
                     redirect_field_name: redirect_to
                     }, context_instance=RequestContext(request))
 
+    openid_url = str(openid_url)
     consumer = make_consumer(request)
     try:
         openid_request = consumer.begin(openid_url)
@@ -198,7 +199,7 @@ def login_begin(request, template_name='openid/login.html',
 
     # Construct the request completion URL, including the page we
     # should redirect to.
-    return_to = request.build_absolute_uri(reverse(login_complete_view))
+    return_to = request.build_absolute_uri(str(getattr(settings, 'OPENID_SSO_RETURN_URL', reverse(login_complete_view))))
     if redirect_to:
         if '?' in return_to:
             return_to += '&'
