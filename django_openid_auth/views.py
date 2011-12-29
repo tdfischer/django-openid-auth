@@ -136,16 +136,18 @@ def parse_openid_response(request):
 
 
 def login_begin(request, template_name='openid/login.html',
-                login_complete_view='openid-complete',
+                openid_url=None,
+                login_complete_url=None,
                 form_class=OpenIDLoginForm,
                 render_failure=default_render_failure,
                 redirect_field_name=REDIRECT_FIELD_NAME):
     """Begin an OpenID login request, possibly asking for an identity URL."""
     redirect_to = request.REQUEST.get(redirect_field_name, '')
 
-    # Get the OpenID URL to try.  First see if we've been configured
-    # to use a fixed server URL.
-    openid_url = conf.SSO_SERVER_URL
+    # Dynamically configurable SSO_SERVER_URL and SSO_RETURN_URL
+    # Useful for Google Apps authentication
+    openid_url = openid_url or conf.SSO_SERVER_URL
+    login_complete_url = login_complete_url or reverse('openid-complete')
 
     if openid_url is None:
         if request.POST:
@@ -199,7 +201,7 @@ def login_begin(request, template_name='openid/login.html',
 
     # Construct the request completion URL, including the page we
     # should redirect to.
-    return_to = request.build_absolute_uri(str(getattr(settings, 'OPENID_SSO_RETURN_URL', reverse(login_complete_view))))
+    return_to = request.build_absolute_uri(str(getattr(settings, 'OPENID_SSO_RETURN_URL', login_complete_url)))
     if redirect_to:
         if '?' in return_to:
             return_to += '&'
