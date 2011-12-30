@@ -46,6 +46,10 @@ class OpenIDBackend:
     """A django.contrib.auth backend that authenticates the user based on
     an OpenID response."""
 
+    supports_object_permissions = False
+    supports_anonymous_user = False
+    supports_inactive_user = False
+
     def get_user(self, user_id):
         try:
             return User.objects.get(pk=user_id)
