@@ -141,24 +141,27 @@ def login_begin(request, template_name='openid/login.html',
     """Begin an OpenID login request, possibly asking for an identity URL."""
     redirect_to = request.REQUEST.get(redirect_field_name, '')
 
-    # Get the OpenID URL to try.  First see if we've been configured
-    # to use a fixed server URL.
-    openid_url = getattr(settings, 'OPENID_SSO_SERVER_URL', None)
+    # Get the OpenID URL to try. First check if openid_url in form,
+    # if not try global settings.
+
+    openid_url = None
+
+    if request.POST:
+        login_form = form_class(data=request.POST)
+        if login_form.is_valid():
+            openid_url = login_form.cleaned_data['openid_identifier']
+    else:
+        login_form = form_class()
 
     if openid_url is None:
-        if request.POST:
-            login_form = form_class(data=request.POST)
-            if login_form.is_valid():
-                openid_url = login_form.cleaned_data['openid_identifier']
-        else:
-            login_form = form_class()
+        openid_url = getattr(settings, 'OPENID_SSO_SERVER_URL', None)
 
-        # Invalid or no form data:
-        if openid_url is None:
-            return render_to_response(template_name, {
-                    'form': login_form,
-                    redirect_field_name: redirect_to
-                    }, context_instance=RequestContext(request))
+    # Invalid or no form data:
+    if openid_url is None:
+        return render_to_response(template_name, {
+                'form': login_form,
+                redirect_field_name: redirect_to
+                }, context_instance=RequestContext(request))
 
     error = None
     consumer = make_consumer(request)
