@@ -45,7 +45,7 @@ from django.views.decorators.csrf import csrf_exempt
 from openid.consumer.consumer import (
     Consumer, SUCCESS, CANCEL, FAILURE)
 from openid.consumer.discover import DiscoveryFailure
-from openid.extensions import sreg, ax
+from openid.extensions import sreg, ax, oauth
 
 from django_openid_auth import conf, teams
 from django_openid_auth.forms import OpenIDLoginForm
@@ -186,6 +186,10 @@ def login_begin(request, template_name='openid/login.html',
     else:
         openid_request.addExtension(
             sreg.SRegRequest(optional=['email', 'fullname', 'nickname']))
+
+    openid_request.addExtension(oauth.OAuthRequest(
+                consumer=getattr(settings, 'GOOGLE_CONSUMER_KEY', ''),
+                scope=" ".join(getattr(settings, 'GOOGLE_OAUTH_EXTRA_SCOPE', ''))))
 
     # Request team info
     launchpad_teams = conf.LAUNCHPAD_TEAMS_MAPPING
