@@ -74,19 +74,27 @@ admin.site.register(UserOpenID, UserOpenIDAdmin)
 if conf.USE_AS_ADMIN_LOGIN:
     from django.http import HttpResponseRedirect
     from django_openid_auth import views
+    from django.contrib.auth.forms import AuthenticationForm
+    class OpenIDAdminAuthenticationForm(AuthenticationForm):
 
-    def _openid_login(self, request, error_message='', extra_context=None):
-        if request.user.is_authenticated():
-            if not request.user.is_staff:
+        def __init__(self, request=None, *args, **kwargs):
+            """
+            Redirect the user to log in via OpenID if they are not logged in.
+            If they are logged in but do not have staff privildges then display error
+            """
+            if request.user.is_authenticated():
+                if not request.user.is_staff:
+                    return views.render_failure(
+                        request, "User %s does not have admin access."
+                        % request.user.username)
                 return views.render_failure(
-                    request, "User %s does not have admin access."
-                    % request.user.username)
-            return views.render_failure(
-                request, "Unknown Error: %s" % error_message)
-        else:
-            # Redirect to openid login path,
-            return HttpResponseRedirect(
-                settings.LOGIN_URL + "?next=" + request.get_full_path())
+                    request, "Unknown Error: %s" % error_message)
+            else:
+                # Redirect to openid login path,
+                return HttpResponseRedirect(
+                    settings.LOGIN_URL + "?next=" + request.get_full_path())
 
-    # Overide the standard admin login form.
-    admin.sites.AdminSite.display_login_form = _openid_login
+
+    admin.sites.AdminSite.login_form = OpenIDAdminAuthenticationForm
+
+
