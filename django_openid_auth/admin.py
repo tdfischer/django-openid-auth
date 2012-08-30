@@ -91,8 +91,8 @@ if conf.USE_AS_ADMIN_LOGIN:
                     request, "Unknown Error: %s" % error_message)
             else:
                 # Redirect to openid login path,
-                return HttpResponseRedirect(
-                    settings.LOGIN_URL + "?next=" + request.get_full_path())
+                raise ForceResponse(HttpResponseRedirect(
+                    settings.LOGIN_URL + "?next=" + request.get_full_path()))
 
 
     admin.sites.AdminSite.login_form = OpenIDAdminAuthenticationForm
