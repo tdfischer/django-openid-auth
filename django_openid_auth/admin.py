@@ -84,11 +84,10 @@ if conf.USE_AS_ADMIN_LOGIN:
             """
             if request.user.is_authenticated():
                 if not request.user.is_staff:
-                    return views.default_render_failure(
-                        request, "User %s does not have admin access."
+                    raise Exception( "User %s does not have admin access."
                         % request.user.username)
-                return views.default_render_failure(
-                    request, "Unknown Error: %s" % error_message)
+                raise Exception(
+                    "Unknown Error: %s" % error_message)
             else:
                 # Redirect to openid login path,
                 raise ForceResponse(HttpResponseRedirect(

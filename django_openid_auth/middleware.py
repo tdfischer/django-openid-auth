@@ -32,3 +32,5 @@ class ForceResponseMiddleware:
                 raise e # as if nothing had happened
         if isinstance(e, ForceResponse):
             return e.response
+        
+        return None
