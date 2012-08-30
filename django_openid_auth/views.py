@@ -187,13 +187,12 @@ def login_begin(request, template_name='openid/login.html',
         openid_request.addExtension(
             sreg.SRegRequest(optional=['email', 'fullname', 'nickname']))
 
-
     if getattr(settings, 'OAUTH_HYBRID_ENABLED', False):
         from openid.extensions import oauth
 
         openid_request.addExtension(oauth.OAuthRequest(
-                    consumer=getattr(settings, 'OAUTH_CONSUMER_KEY', ''),
-                    scope=" ".join(getattr(settings, 'OAUTH_EXTRA_SCOPE', ''))))
+            consumer=getattr(settings, 'OAUTH_CONSUMER_KEY', ''),
+            scope=" ".join(getattr(settings, 'OAUTH_EXTRA_SCOPE', ''))))
 
     # Request team info
     launchpad_teams = conf.LAUNCHPAD_TEAMS_MAPPING

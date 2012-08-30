@@ -68,9 +68,12 @@ single signon systems.
     decorator to use the OpenID login page.
 
  8. If you need OpenID + OAuth hybrid authentication as described here (https://developers.google.com/accounts/docs/OpenID#oauth)
-    you can enable it by adding the setting OAUTH_HYBRID_ENABLED (default: False):
+    you can enable it by adding the settings:
 
-        OAUTH_HYBRID_ENABLED = True
+        OAUTH_CONSUMER_KEY                = "example.com"
+        OAUTH_CONSUMER_SECRET             = ""
+        OAUTH_EXTRA_SCOPE                 = ['https://www.google.com/m8/feeds/', ]
+        OAUTH_HYBRID_ENABLED              = True
 
  9. Rerun "python manage.py syncdb" to add the UserOpenID table to
     your database.
