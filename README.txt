@@ -67,7 +67,15 @@ single signon systems.
     This will allow pages that use the standard @login_required
     decorator to use the OpenID login page.
 
- 8. Rerun "python manage.py syncdb" to add the UserOpenID table to
+ 8. If you need OpenID + OAuth hybrid authentication as described here (https://developers.google.com/accounts/docs/OpenID#oauth)
+    you can enable it by adding the settings:
+
+        OAUTH_CONSUMER_KEY                = "example.com"
+        OAUTH_CONSUMER_SECRET             = ""
+        OAUTH_EXTRA_SCOPE                 = ['https://www.google.com/m8/feeds/', ]
+        OAUTH_HYBRID_ENABLED              = True
+
+ 9. Rerun "python manage.py syncdb" to add the UserOpenID table to
     your database.
 
 
@@ -111,7 +119,7 @@ If you use OPENID_LAUNCHPAD_TEAMS_MAPPING_AUTO, the variable OPENID_LAUNCHPAD_TE
 If you want to exclude some groups from the auto mapping, use OPENID_LAUNCHPAD_TEAMS_MAPPING_AUTO_BLACKLIST. This variable has only an effect if OPENID_LAUNCHPAD_TEAMS_MAPPING_AUTO is True.
 
 	OPENID_LAUNCHPAD_TEAMS_MAPPING_AUTO_BLACKLIST = ['django-group1', 'django-group2']
-	
+
 == External redirect domains ==
 
 By default, redirecting back to an external URL after auth is forbidden. To permit redirection to external URLs on a separate domain, define ALLOWED_EXTERNAL_OPENID_REDIRECT_DOMAINS in your settings.py file as a list of permitted domains:
@@ -126,6 +134,6 @@ If you require openid authentication into the admin application, add the followi
 
         OPENID_USE_AS_ADMIN_LOGIN = True
 
-It is worth noting that a user needs to be be marked as a "staff user" to be able to access the admin interface.  A new openid user will not normally be a "staff user".  
-The easiest way to resolve this is to use traditional authentication (OPENID_USE_AS_ADMIN_LOGIN = False) to sign in as your first user with a password and authorise your 
+It is worth noting that a user needs to be be marked as a "staff user" to be able to access the admin interface.  A new openid user will not normally be a "staff user".
+The easiest way to resolve this is to use traditional authentication (OPENID_USE_AS_ADMIN_LOGIN = False) to sign in as your first user with a password and authorise your
 openid user to be staff.
