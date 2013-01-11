@@ -41,5 +41,5 @@ urlpatterns = patterns('',
     (r'^logout/$', 'django.contrib.auth.views.logout'),
     (r'^private/$', views.require_authentication),
 
-    (r'^admin/(.*)', admin.site.urls),
+    (r'^admin/', admin.site.urls),
 )
