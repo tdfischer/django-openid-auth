@@ -77,10 +77,9 @@ class OpenIDLoginForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'required openid'}))
 
     def clean_openid_identifier(self):
-        if 'openid_identifier' in self.cleaned_data:
-            openid_identifier = self.cleaned_data['openid_identifier']
-            if (xri.identifierScheme(openid_identifier) == 'XRI'
-                    and conf.DISALLOW_INAMES):
-                raise forms.ValidationError(_('i-names are not supported'))
-            return self.cleaned_data['openid_identifier']
+        openid_identifier = self.cleaned_data['openid_identifier']
+        if (xri.identifierScheme(openid_identifier) == 'XRI'
+                and conf.DISALLOW_INAMES):
+            raise forms.ValidationError(_('i-names are not supported'))
+        return self.cleaned_data['openid_identifier']
 
