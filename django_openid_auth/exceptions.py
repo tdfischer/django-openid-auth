@@ -1,6 +1,5 @@
 # django-openid-auth -  OpenID integration for django.contrib.auth
 #
-# Copyright (C) 2007 Simon Willison
 # Copyright (C) 2008-2010 Canonical Ltd.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,32 +26,43 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from django.contrib.auth.models import User
-from django.db import models
+"""Exception classes thrown by OpenID Authentication and Validation."""
 
+class DjangoOpenIDException(Exception):
+    pass
 
-class Nonce(models.Model):
-    server_url = models.CharField(max_length=2047)
-    timestamp = models.IntegerField()
-    salt = models.CharField(max_length=40)
+class RequiredAttributeNotReturned(DjangoOpenIDException):
+    pass
 
-    def __unicode__(self):
-        return u"Nonce: %s, %s" % (self.server_url, self.salt)
+class IdentityAlreadyClaimed(DjangoOpenIDException):
 
+    def __init__(self, message=None):
+        if message is None:
+            self.message = "Another user already exists for your selected OpenID"
+        else:
+            self.message = message
 
-class Association(models.Model):
-    server_url = models.TextField(max_length=2047)
-    handle = models.CharField(max_length=255)
-    secret = models.TextField(max_length=255) # Stored base64 encoded
-    issued = models.IntegerField()
-    lifetime = models.IntegerField()
-    assoc_type = models.TextField(max_length=64)
+class DuplicateUsernameViolation(DjangoOpenIDException):
 
-    def __unicode__(self):
-        return u"Association: %s, %s" % (self.server_url, self.handle)
+    def __init__(self, message=None):
+        if message is None:
+            self.message = "Your desired username is already being used."
+        else:
+            self.message = message
 
+class MissingUsernameViolation(DjangoOpenIDException):
 
-class UserOpenID(models.Model):
-    user = models.ForeignKey(User)
-    claimed_id = models.TextField(max_length=2047, unique=True)
-    display_id = models.TextField(max_length=2047)
+    def __init__(self, message=None):
+        if message is None:
+            self.message = "No nickname given for your account."
+        else:
+            self.message = message
+
+class MissingPhysicalMultiFactor(DjangoOpenIDException):
+
+    def __init__(self, message=None):
+        if message is None:
+            self.message = "Login requires physical multi-factor authentication."
+        else:
+            self.message = message
+

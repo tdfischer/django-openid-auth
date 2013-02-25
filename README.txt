@@ -45,10 +45,6 @@ single signon systems.
 
         OPENID_UPDATE_DETAILS_FROM_SREG = True
 
-    and/or:
-
-        OPENID_UPDATE_DETAILS_FROM_AX = True
-
  6. Hook up the login URLs to your application's urlconf with
     something like:
 
@@ -67,15 +63,7 @@ single signon systems.
     This will allow pages that use the standard @login_required
     decorator to use the OpenID login page.
 
- 8. If you need OpenID + OAuth hybrid authentication as described here (https://developers.google.com/accounts/docs/OpenID#oauth)
-    you can enable it by adding the settings:
-
-        OAUTH_CONSUMER_KEY                = "example.com"
-        OAUTH_CONSUMER_SECRET             = ""
-        OAUTH_EXTRA_SCOPE                 = ['https://www.google.com/m8/feeds/', ]
-        OAUTH_HYBRID_ENABLED              = True
-
- 9. Rerun "python manage.py syncdb" to add the UserOpenID table to
+ 8. Rerun "python manage.py syncdb" to add the UserOpenID table to
     your database.
 
 
@@ -119,7 +107,7 @@ If you use OPENID_LAUNCHPAD_TEAMS_MAPPING_AUTO, the variable OPENID_LAUNCHPAD_TE
 If you want to exclude some groups from the auto mapping, use OPENID_LAUNCHPAD_TEAMS_MAPPING_AUTO_BLACKLIST. This variable has only an effect if OPENID_LAUNCHPAD_TEAMS_MAPPING_AUTO is True.
 
 	OPENID_LAUNCHPAD_TEAMS_MAPPING_AUTO_BLACKLIST = ['django-group1', 'django-group2']
-
+	
 == External redirect domains ==
 
 By default, redirecting back to an external URL after auth is forbidden. To permit redirection to external URLs on a separate domain, define ALLOWED_EXTERNAL_OPENID_REDIRECT_DOMAINS in your settings.py file as a list of permitted domains:
@@ -134,6 +122,47 @@ If you require openid authentication into the admin application, add the followi
 
         OPENID_USE_AS_ADMIN_LOGIN = True
 
-It is worth noting that a user needs to be be marked as a "staff user" to be able to access the admin interface.  A new openid user will not normally be a "staff user".
-The easiest way to resolve this is to use traditional authentication (OPENID_USE_AS_ADMIN_LOGIN = False) to sign in as your first user with a password and authorise your
+It is worth noting that a user needs to be be marked as a "staff user" to be able to access the admin interface.  A new openid user will not normally be a "staff user".  
+The easiest way to resolve this is to use traditional authentication (OPENID_USE_AS_ADMIN_LOGIN = False) to sign in as your first user with a password and authorise your 
 openid user to be staff.
+
+== Change Django usernames if the nickname changes on the provider ==
+
+If you want your Django username to change when a user updates the nickname on their provider, add the following setting:
+
+        OPENID_FOLLOW_RENAMES = True
+
+If the new nickname is available as a Django username, the user is renamed.
+Otherwise the user will be renamed to nickname+i for an incrememnting value of i until no conflict occurs.
+If the user has already been renamed to nickname+1 due to a conflict, and the nickname is still not available, the user will keep their existing username.
+
+== Require a valid nickname ==
+
+If you must have a valid, unique nickname in order to create a user accont, add the following setting:
+
+        OPENID_STRICT_USERNAMES = True
+        
+This will cause an OpenID login attempt to fail if the provider does not return a 'nickname' (username) for the user, or if the nickname conflicts with an existing user with a different openid identiy url.
+Without this setting, logins without a nickname will be given the username 'openiduser', and upon conflicts with existing username, an incrementing number will be appended to the username until it is unique.
+
+== Require Physical Multi-Factor Authentication ==
+
+If your users should use a physical multi-factor authentication method, such as RSA tokens or YubiKey, add the following setting:
+
+        OPENID_PHYSICAL_MULTIFACTOR_REQUIRED = True
+        
+If the user's OpenID provider supports the PAPE extension and provides the Physical Multifactor authentication policy, this will
+cause the OpenID login to fail if the user does not provide valid physical authentication to the provider.
+
+== Override Login Failure Handling ==
+
+You can optionally provide your own handler for login failures by adding the following setting:
+
+        OPENID_RENDER_FAILURE = failure_handler_function
+
+Where failure_handler_function is a function reference that will take the following parameters:
+
+        def failure_handler_function(request, message, status=None, template_name=None, exception=None)
+
+This function must return a Django.http.HttpResponse instance.
+

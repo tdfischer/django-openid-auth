@@ -43,7 +43,7 @@ from distutils.core import setup
 
 
 description, long_description = __doc__.split('\n\n', 1)
-VERSION = '0.3'
+VERSION = '0.4'
 
 setup(
     name='django-openid-auth',
@@ -76,5 +76,5 @@ setup(
         'django_openid_auth': ['templates/openid/*.html'],
         },
     provides=['django_openid_auth'],
-    requires=['django (>=1.2)', 'openid (>=2.2.0)'],
+    requires=['django (>=1.1.2)', 'openid (>=2.2.0)'],
     )
